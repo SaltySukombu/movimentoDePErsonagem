@@ -5,58 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movimento de Personagem</title>
     <link rel="shortcut icon" href="dash.jpg" type="image/jpg">
-</head>
+
     <style>
         body{
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100 vh;
             background-color: #c7bebe;
-            overflow: hidden;
         }
         #gameArea{
             position: relative;
             width: 400px;
             height: 400px;
-            background-color: aqua;
+            background-color: rgb(236, 238, 238);
             border: 2px solid black;
         }
-        .player,.goal{
+        .player,.goal,.obstacle{
             position: absolute;
             width: 40px;
             height: 40px;
             border-radius: 10px;
         }
         .player{
-            background-color: black;
+            background-image:url("Doggy.webp");
+            background-size: cover;
             top: 180px;
             left: 180px;
         }
         .goal{
-            background-color: red;
+            background-color: green;
             top: 50px;
             left: 300px;
         }
+        .obstacle{
+            background-color: red;
+
+        }
+        .obstacle1{
+            top: 100px;
+            left: 100px;
+        }
+        .obstacle2{
+            top: 200px;
+            left: 250px;
+        }
+        .obstacle3{
+            top: 300px;
+            left: 150px;
+        }
     </style>
+</head>
 <body>
     <div id="gameArea">
         <div class="player" id="player"></div>
         <div class="goal"></div>
+        <div class="obstacle obstacle1"></div>
+        <div class="obstacle obstacle2"></div>
+        <div class="obstacle obstacle3"></div>
     </div>
     <script>
         const player = document.getElementById("player");
+        const goal = document.querySelector(".goal");
+        const obstacles = document.querySelectorAll(".obstacle");
         const step = 20;
         let posX = 180;
         let posY = 180;
+        let gameover = false;
+
         document.addEventListener("keydown",(event) => {
-            if (event.key === "ArrowUp" && posY > 0) posY -= step;
-            if (event.key === "ArrowDown" && posY <360) posY += step;
-            if (event.key === "ArrowLeft" && posX > 0) posX -= step;
-            if (event.key === "ArrowRight" && posX <360) posX += step;
-            player.style.top = posY + "px"
-            player.style.left = posX +"px"
+            if (gameover) return;
+            let newx = posX;
+            let newy = posY;
+            if (event.key === "ArrowUp" && posY > 0) newy -= step;
+            if (event.key === "ArrowDown" && posY <360) newy += step;
+            if (event.key === "ArrowLeft" && posX > 0) newx -= step;
+            if (event.key === "ArrowRight" && posX <360) newx += step;
+            if (!checkCollision(newx,newy)) {
+                posX = newx;
+                posY = newy;
+                player.style.top = posY + "px";
+                player.style.left = posX +"px";
+            }
+            checkWin();
         })
+        function checkCollision(x,y){
+            for (let obstacle of obstacles){
+                let obsX = obstacle.offsetLeft;
+                let obsY = obstacle.offsetTop;
+                if (x < obsX + 40 && x + 40 > obsX && y < obsY + 40 && y + 40 > obsY){
+                    return true;
+                }
+            }
+            return false;
+        }
+        function checkWin(){
+            let goalX = goal.offsetLeft;
+            let goalY = goal.offsetTop;
+            if (posX < goalX + 40 && posX +40 > goalX && posY < goalY + 40 && posY + 40 > goalY){
+                alert("Parabens🎉🎉");
+                gameover = true;
+            }
+        }
     </script>
 </body>
 </html>
